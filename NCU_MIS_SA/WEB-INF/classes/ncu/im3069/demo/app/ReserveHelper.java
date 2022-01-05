@@ -52,8 +52,8 @@ public class ReserveHelper {
             pres.setInt(1, user_id);
             pres.setString(2, name);
             pres.setString(3, phone_number);
-            pres.setInt(4, reserve_datetime_id);
-            pres.setInt(5, number_of_people);
+            pres.setInt(4, number_of_people);
+            pres.setInt(5, reserve_datetime_id);
             pres.setString(6, note);
             
             /** 執行新增之SQL指令並記錄影響之行數 */
