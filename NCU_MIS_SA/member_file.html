@@ -1,0 +1,51 @@
+<html>
+
+<head>
+    <title>Member File Page</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel=stylesheet type="text/css" href="mystyle.css">
+</head>
+
+
+<header>
+    <button class="button-back">
+        檢視會員資料
+    </button>
+</header>
+
+<body onload="getMemberData()">
+    <table class="member-file" cellpadding=5 align=center>
+        <tr>
+            <td align=center>
+                <font size="3">會員姓名</font>
+            </td>
+            <td><p id="name"></p></td>
+        </tr>
+
+        <tr>
+            <td align=center>
+                <font size="3">電子信箱</font>
+            </td>
+            <td><p id="email"></p></td>
+        </tr>
+    </table>
+    <ul id="ul_top_hyper">
+        <li>
+            <button onclick="window.location.href='member_edit_page.html'">修改</button>
+        </li>
+
+        <li>
+            <a href="member_center.html"><button>返回</button></a>
+        </li>
+    </ul>
+</body>
+<script type="text/javascript">
+	function getMemberData(){
+		jsarray=JSON.parse(sessionStorage.getItem("user"));
+		document.getElementById("name").innerHTML=jsarray[2];
+		document.getElementById("email").innerHTML=jsarray[1];
+	}
+</script>
+
+</html>

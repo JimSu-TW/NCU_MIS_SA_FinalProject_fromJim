@@ -1,0 +1,132 @@
+<html>
+    <head>
+        <link rel="stylesheet" href = "mystyle3.css">
+        <title>修改訂位</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"> </script>
+        <script src="statics/js/jquery-3.4.1.min.js"></script>
+    </head>
+    <body onload="loadFormData()">
+        <div class ="header">
+            <ul>
+                <span class= "title"><strong>修改訂位</strong></span>
+            </ul>
+        </div>
+        <div class="background_1">
+            
+                <div class="booking" style="position:absolute;top:5%;left:20%;width:60%;height:60%;">
+                    <div class="booking-l">
+                        <ul class = "main-l">
+                            <h4>預約日期時間</h4>
+                            <p id="datetime"></p>
+                            <h4>用餐人數</h4>
+                            <p id="num_of_people"></p>
+                            <h4>備註</h4>
+                            <p id="note"> </p>
+                        </ul>
+                    </div>
+                    <div class="booking-r">
+                        <ul class = "main-r">
+                            <h4>姓名</h4>
+                            <p id="name"></p>
+                            <h4>聯絡電話</h4>
+                            <p id="phone"></p>
+                            <h4>信箱</h4>
+                            <p id="email"></p>
+                            <div>
+                                <ul class = "booking-footer">
+                                    <li>
+                                        <button id = "bookingbtn" onclick = "CheckIn()" >
+                                            訂位報到
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button id="booking-editbtn" onclick="window.location.href='edit_reservation_manager.html'">修改資料</button>
+                                    </li>
+                                    <li>
+                                        <button id="backbtn" onclick="backToView()" style="background-color: RGBA(22,18,107,0.33);font-size: medium;width:100px;height:35px;box-shadow: 2px 4px #888888;border-radius:15px;">返回</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </ul>
+                    </div>
+                </div>       
+        </div>
+        
+    </body>
+</html>
+<script type="text/javascript">
+    function loadFormData(){
+    	var url = new URL(window.location.href);
+        var reserve_id=url.toString().slice(url.toString().search("html?")+5);
+        var data_object = {
+             "reserve_id": reserve_id
+        };
+        
+	    $.ajax({
+	    type: "GET",
+	    url: "api/reserve.do",
+	    data: data_object,
+	    crossDomain: true,
+	    cache: false,
+	    dataType: 'json',
+	    timeout: 5000,
+	    success: function (response) {
+	      if (response.status == 200) {
+	    	var data=response.response.data;
+	    	document.getElementById("datetime").innerHTML=data['reserve_datetime'];
+	        document.getElementById("num_of_people").innerHTML=data['number_of_people'];
+	        document.getElementById("name").innerHTML=data['name'];
+	        document.getElementById("phone").innerHTML=data['phone_number'];
+	        document.getElementById("note").innerHTML=data['note'];
+	        document.getElementById("email").innerHTML=data['email'];
+	        jsarray=[reserve_id,document.getElementById("datetime").innerHTML,document.getElementById("num_of_people").innerHTML,document.getElementById("name").innerHTML,document.getElementById("phone").innerHTML,document.getElementById("note").innerHTML,data['reserve_datetime_id'],data['user_id']];
+	        sessionStorage.setItem("modify_reserve_data", JSON.stringify(jsarray));
+	      }
+	    },
+	    error: function () {
+	        alert("無法連線到伺服器！");
+	        }
+	    });
+    }
+    
+    function backToView(){
+    	sessionStorage.removeItem("modify_reserve_data");
+    	window.location.href="manager_reservation_edit.html";
+    }
+    
+    function CheckIn(){
+    	var jsarray = JSON.parse(sessionStorage.getItem("modify_reserve_data"));
+    	var data_object = {
+                "reserve_id": jsarray[0],
+                "user_id": jsarray[7],
+                "name": jsarray[3],
+                "phone_number": document.getElementById("phone").innerHTML,
+                "reserve_datetime_id": jsarray[6],
+                "number_of_people":jsarray[6],
+                "rate":0,
+                "note":document.getElementById("note").innerHTML,
+                "checkin":1
+        };
+		var data_string = JSON.stringify(data_object);
+        $.ajax({
+            type: "PUT",
+            url: "api/reserve.do",
+            data: data_string,
+            crossDomain: true,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+                if(JSON.stringify(response.status) === '"200"'){
+                    alert("報到成功");
+                    backToView();
+                }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+        });
+    }
+</script>

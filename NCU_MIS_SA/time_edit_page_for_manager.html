@@ -1,0 +1,118 @@
+<html>
+
+<head>
+    <title>Time File Page</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel=stylesheet type="text/css" href="mystyle.css">
+</head>
+
+
+<header>
+    <label class="label-back">
+        檢視時間資料
+    </label>
+</header>
+
+<body onload="getTimeData()">
+    <table class="member-file" cellpadding=5 align=center>
+    	<tr>
+            <td align=center>
+                <font size="3">ReserveDatetime ID</font>
+            </td>
+            <td><p size=40 id="id" ></p></td>
+        </tr>
+        <tr>
+            <td align=center>
+                <font size="3">時段</font>
+            </td>
+            <td><p size=40 id="datetime" ></p></td>
+        </tr>
+        <tr>
+            <td align=center>
+                <font size="3">人數</font>
+            </td>
+            <td><input type="number" min="1" max="100" id="num" style="width: 70px;"></td>
+        </tr>
+    </table>
+    <ul id="ul_top_hyper">
+        <li>
+            <button onclick="Modify()">確認修改</button>
+        </li>
+
+        <li>
+            <button onclick="backToFile()">取消</button>
+        </li>
+    </ul>
+</body>
+<script type="text/javascript">
+	function getTimeData(){
+		var url = new URL(window.location.href);
+        var reserve_datetime_id=url.toString().slice(url.toString().search("html?")+5);
+		document.getElementById("id").innerHTML=reserve_datetime_id;
+		var data_object = {
+            "reserve_datetime_id": reserve_datetime_id
+        };
+        // 發出POST的AJAX請求
+        $.ajax({
+                type: "GET",
+                url: "api/reservedatetime.do",
+                data: data_object,
+                crossDomain: true,
+                cache: false,
+                dataType: 'json',
+                timeout: 5000,
+                success: function (response) {
+                	var outuserdata=JSON.stringify(response.response.data);
+                	var fixoutuserdata=outuserdata.replace('[','');
+                	var fixoutuserdata=fixoutuserdata.replace(']','');
+                	outuserdata=JSON.parse(fixoutuserdata);
+                    document.getElementById("datetime").innerHTML=outuserdata['available_datetime'];
+                    document.getElementById("num").innerHTML=outuserdata['available_seat_number'];
+                },
+                error: function () {
+                    alert("無法連線到伺服器！");
+                }
+        });
+	}
+	
+	function Modify(){
+		if(document.getElementById("num").value>0 && document.getElementById("num").value<=100){
+			var data_object = {
+		            "reserve_datetime_id": document.getElementById("id").innerHTML,
+		            "reserve_datetime": document.getElementById("datetime").innerHTML,
+		            "seat": document.getElementById("num").value
+		        };
+			var data_string=JSON.stringify(data_object);
+	        // 發出POST的AJAX請求
+	        $.ajax({
+	                type: "PUT",
+	                url: "api/reservedatetime.do",
+	                data: data_string,
+	                crossDomain: true,
+	                cache: false,
+	                dataType: 'json',
+	                timeout: 5000,
+	                success: function (response) {
+	                	$('#flashMessage').html(response.message);
+                        $('#flashMessage').show();
+                        if(response.status == 200){
+                        	 alert("修改成功");
+                        	 backToFile();
+                        }
+	                },
+	                error: function () {
+	                    alert("無法連線到伺服器！");
+	                }
+	        });
+		}
+		else{
+			alert("人數須在1~100間!");
+		}
+	}
+	
+	function backToFile(){
+		window.location.href="admin_edit_reservedatetime.html";
+	}
+</script>
+</html>
