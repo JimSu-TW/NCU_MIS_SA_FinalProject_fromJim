@@ -1,0 +1,230 @@
+<html>
+    <head>
+        <link rel="stylesheet" href = "mystyle3.css">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="statics/js/jquery-3.4.1.min.js"></script>
+        <title>Manager view</title>
+    </head>
+    <body onload="getAllReserve()">
+        <div class ="header">
+            <ul>
+                <span class= "title"><strong>刪除訂位</strong></span>
+            </ul>
+        </div>
+        <table id="table" class="booking-table" align="center" border="1"> 
+            <thead align="center">
+                <tr>
+                    <th>訂位編號</th>
+                    <th>報到</th>
+                    <th>姓名</th>
+                    <th>信箱</th>
+                    <th>電話</th>
+                    <th>預約時段</th>
+                    <th>刪除/修改</th>
+                </tr>
+            </thead>
+            <tbody align="center">
+            </tbody>
+        </table>
+        <div>
+            <ul class="modal-footer-manager">
+                <li>
+                    <button class="footer_btn2" onclick="window.location.href='admin_reservation.html'">返回</button>
+                </li>
+            </ul>
+        </div>
+    </body>
+   	<script type="text/javascript">
+	    function getAllReserve() {
+	        $.ajax({
+	        type: "GET",
+	        url: "api/reserve.do",
+	        crossDomain: true,
+	        cache: false,
+	        dataType: 'json',
+	        timeout: 5000,
+	        success: function (response) {
+	          if (response.status == 200) {
+	        	var data=response.response.data;
+	            addReserve(data);
+	          }
+	        },
+	        error: function () {
+	            alert("無法連線到伺服器！");
+	            }
+	        });
+	    }
+	
+	   function addReserve(data) {
+		   var delete_btn1='<button class="delete_btn" onclick="getReserveData('
+		   var delete_btn2=')">刪除</button><nobr>&nbsp;&nbsp;</nobr>';
+           var modify_btn1='<button onclick="goEditReserve(';
+           var modify_btn2=')" class="cancel_btn">修改</button>';
+           var modify_btn3='<button onclick="goSeeReserve(';
+           var modify_btn4=')">查看內容</button>';
+	       var reserve_html = '';
+	       if(data==="[{}]"){
+	    	   reserve_html += '<tr><td>None</td>';
+	    	   reserve_html += '<td>None</td>';
+	    	   reserve_html += '<td>None</td>';
+	    	   reserve_html += '<td>None</td>';
+	    	   reserve_html += '<td>None</td>';
+	    	   reserve_html += '<td>None</td>';
+	    	   reserve_html += '<td>None</td></tr>';
+	    	}
+	       else{
+	    	   $.each(data, function(index, value) {
+	        	   reserve_html += '<tr><td>' + value['reserve_id'] + '</td>';
+	        	   if(value['checkin']===1){
+	        		   reserve_html += '<td>已報到</td>';
+		        	   reserve_html += '<td>' + value['name'] + '</td>';
+		        	   reserve_html += '<td>' + value['email'] + '</td>';
+		        	   reserve_html += '<td>' + value['phone_number'] + '</td>';
+		        	   reserve_html += '<td>' + value['reserve_datetime'] + '</td>';
+		        	   reserve_html += '<td>'+modify_btn3 + value['reserve_id'] + modify_btn4+'</td></tr>'; 
+	        	   }
+	        	   else{
+	        		   reserve_html += '<td>未報到</td>';
+		        	   reserve_html += '<td>' + value['name'] + '</td>';
+		        	   reserve_html += '<td>' + value['email'] + '</td>';
+		        	   reserve_html += '<td>' + value['phone_number'] + '</td>';
+		        	   reserve_html += '<td>' + value['reserve_datetime'] + '</td>';
+		        	   reserve_html += '<td>' + delete_btn1 + value['reserve_id'] + delete_btn2 + modify_btn1 + value['reserve_id'] + modify_btn2+'</td></tr>';
+	        	   } 
+	           }) 
+	       }
+	       $("#table > tbody").append(reserve_html);
+	   }
+	   
+	   function goDeleteByReserveId(id){
+		   var data_object = {
+                   "reserve_id": id,
+                   "user_id": 0,
+                   "name": "cancel",
+                   "phone_number": "cancel",
+                   "reserve_datetime_id": 0,
+                   "number_of_people":0,
+                   "rate":0,
+                   "note":"cancel",
+                   "checkin":0  
+           };
+		   var data_string = JSON.stringify(data_object);
+           $.ajax({
+               type: "PUT",
+               url: "api/reserve.do",
+               data: data_string,
+               crossDomain: true,
+               cache: false,
+               dataType: 'json',
+               timeout: 5000,
+               success: function (response) {
+                   if(JSON.stringify(response.status) === '"200"'){
+                	   getSeat();
+                   }
+               },
+               error: function () {
+                   alert("無法連線到伺服器！");
+               }
+           });
+       }
+	   
+	   function goEditReserve(id){
+		   window.location.href="manager_show_reservation.html?"+id;
+	   }
+	   
+	   function goSeeReserve(id){
+		   window.location.href="manager_show_reservation_onlyview.html?"+id;
+	   }
+	   
+	   function getReserveData(id){
+		   var data_object = {
+                   "reserve_id": id
+           };
+           $.ajax({
+               type: "GET",
+               url: "api/reserve.do",
+               data: data_object,
+               crossDomain: true,
+               cache: false,
+               dataType: 'json',
+               timeout: 5000,
+               success: function (response) {
+                   var data = response.response.data;
+                   var datetime = data["reserve_datetime"];
+                   var number_of_people = data["number_of_people"];
+                   jsarray=[data['reserve_datetime_id'],datetime,number_of_people];
+                   sessionStorage.setItem("deleting_reserve", JSON.stringify(jsarray));
+                   goDeleteByReserveId(id);
+               },
+               error: function () {
+                   alert("無法連線到伺服器！");
+               }
+           });
+	   }
+	   
+	   function getSeat(){
+	    	var data = JSON.parse(sessionStorage.getItem("deleting_reserve"));
+	    	var datetime_id = data[0];
+	    	var haveseat = data[2];
+	    	var data_object = {
+	                "reserve_datetime_id": datetime_id
+	            };
+           // 發出POST的AJAX請求
+           $.ajax({
+                   type: "GET",
+                   url: "api/reservedatetime.do",
+                   data: data_object,
+                   crossDomain: true,
+                   cache: false,
+                   dataType: 'json',
+                   timeout: 5000,
+                   success: function (response) {
+                   	var outuserdata=JSON.stringify(response.response.data);
+                   	var fixoutuserdata=outuserdata.replace('[','');
+                   	var fixoutuserdata=fixoutuserdata.replace(']','');
+                   	outuserdata=JSON.parse(fixoutuserdata);
+                   	var newseat=haveseat+parseInt(outuserdata['available_seat_number']);
+                       jsarray=[data[0],data[1],newseat];
+                       sessionStorage.setItem("give_back_seat", JSON.stringify(jsarray));
+                  	   addSeat();
+                   },
+                   error: function () {
+                       alert("無法連線到伺服器！");
+                   }
+           });
+	    	
+		}
+	    
+	    function addSeat(){
+	    	var data = JSON.parse(sessionStorage.getItem("give_back_seat"));
+	    	var data_object = {
+		            "reserve_datetime_id": data[0],
+		            "reserve_datetime": data[1],
+		            "seat": data[2]
+		        };
+			var data_string=JSON.stringify(data_object);
+	        // 發出POST的AJAX請求
+	        $.ajax({
+	                type: "PUT",
+	                url: "api/reservedatetime.do",
+	                data: data_string,
+	                crossDomain: true,
+	                cache: false,
+	                dataType: 'json',
+	                timeout: 5000,
+	                success: function (response) {
+                      	if(response.status == 200){
+                      	 	alert("刪除成功");
+                      	 	sessionStorage.removeItem("deleting_reserve");
+                      	 	sessionStorage.removeItem("give_back_seat");
+                            window.location.href="manager_reservation_edit.html";
+                      	}
+	                },
+	                error: function () {
+	                    alert("無法連線到伺服器！");
+	                }
+	        });
+	    }
+   </script>
+</html>

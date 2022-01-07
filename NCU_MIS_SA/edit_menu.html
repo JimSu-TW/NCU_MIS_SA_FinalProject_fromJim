@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <link rel="stylesheet" href="mystyle2.css">
+      <script src="statics/js/jquery-3.4.1.min.js"></script>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+      <title>view the menu</title>
+    </head>
+    <body onload="getData()">
+          <div class="header">
+             <div class="title">查看餐點內容</div>
+             
+          </div>        
+          <div class="background_4"> 
+             <div><p class=word_header>簡介:<hr width=80% size=0></p>
+             <div id="brief_desc_2" contenteditable="true" style="width:80%;height:24%;position:absolute;top:18%;left:10%;background-color:#FFFFFF;"></div>
+             </div>
+             <br>
+             <div><p class=word_header style="margin-top:25%">餐點內容:</p>
+             <hr width=80% size=1>
+             <div id="food" contenteditable="true" style="width:80%;height:24%;position:absolute;top:55%;left:10%;background-color:#FFFFFF;"></div>
+             </div>
+             
+           
+             <button style="width:15%;height:8%;box-shadow: 2px 4px #888888;background-color:#D67E4D;margin-left:55%;margin-top:28%;position:absolute;" onclick="saveData()">完成</button>      
+             <button style="width:15%;height:8%;box-shadow: 2px 4px #888888;background-color:#A5D4FF;margin-left:75%;margin-top:28%;position:absolute;" onclick="window.location.href='menu_manager.html'">取消</button>                  
+          </div>  
+          <div class="background_menu">
+                
+           <img src="https://www.gomaji.com/blog/wp-content/uploads/2020/01/food-3676796_1280.jpg" class="photo_up">
+           <img src="https://www.gomaji.com/blog/wp-content/uploads/2020/01/food-3676796_1280.jpg" class="photo_down" >
+           <img src="https://www.gomaji.com/blog/wp-content/uploads/2020/01/food-3676796_1280.jpg" class="photo_middle" ></div>
+          </div>   
+    </body>
+    <script type="text/javascript">
+    function saveData(){
+		localStorage.setItem('food', document.getElementById("food").innerHTML);
+		localStorage.setItem('brief_desc_2', document.getElementById("brief_desc_2").innerHTML);
+		window.location.href="menu_manager.html";
+	}
+    function getData(){
+    	document.getElementById("food").innerHTML=localStorage.getItem('food');
+    	document.getElementById("brief_desc_2").innerHTML=localStorage.getItem('brief_desc_2');
+    }
+    </script>
+</html>

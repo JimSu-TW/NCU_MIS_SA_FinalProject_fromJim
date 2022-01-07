@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="mystyle2.css">
+        <script src="statics/js/jquery-3.4.1.min.js"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+        <title>修改訂位</title>
+    </head>
+    <body onload="loadOriginData()">
+        <div class="header">
+            <div class="title">刪除訂位</div>
+        </div>
+        <div><br><br></div>
+        <div class="background_1">
+            <img src="https://livejapan.com/public/operation/spot/theme/fine-dining-restaurants/img/main2.jpg" class="photo2">
+            <div class="background_3">
+                <label for="預計日期時段" style="margin-top:5%; margin-left:20%;position:absolute;">
+					<b>預計日期</b>
+				</label>
+                <div style="border-width: 2px; border-style:solid ; width: 380px; height: 15px; border-color: #967F65; padding: 5px; text-align: center;margin-left:20%;margin-top:12%;">
+					<p id="datetime" style="position: absolute;margin-top:0;margin-left: 12%;top:11.5%;left:10%;"></p>
+				</div>
+
+                <label for="用餐人數" style="margin-top:2%; margin-left:20%;position:absolute;">
+					<b>用餐人數</b>
+				</label>
+                <div style="border-width: 2px; border-style:solid ; width: 380px; height: 15px; border-color: #967F65; padding: 5px; text-align: center;margin-left:20%;margin-top:8%;">
+					<p id="num_of_people" style="position: absolute;margin-top:0;margin-left: 12%;top:25.5%;left:10%;"></p>
+				</div>
+
+                <label for="姓名" style="margin-top:2%; margin-left:20%;position:absolute;">
+					<b>姓名</b>
+				</label>
+                <div style="border-width: 2px; border-style:solid ; width: 380px; height: 15px; border-color: #967F65; padding: 5px; text-align: center;margin-left:20%;margin-top:8%;">
+					<p id="name"style="position: absolute;margin-top:0;margin-left: 12%;top:39.5%;left:10%;"></p>
+				</div>
+                <label for="備註" style="margin-top:2%; margin-left:20%;position:absolute;">
+					<b>備註</b>
+				</label>
+                <div style="border-width: 2px; border-style:solid ; width: 380px; height: 50px; border-color: #967F65; padding: 5px; text-align: center;margin-left:20%;margin-top:8%;">
+					<p id="note" style="position: absolute;margin-top:0;margin-left: 12%;top:54%;left:10%;"></p>
+				</div>
+
+                <button style="width:15%;height:8%;box-shadow: 2px 4px #888888;background-color:#D89343;border-radius:15px;margin-left:35%;margin-top:5%;" onclick="DeleteReserve()">確定刪除</button>      
+                <button style="width:15%;height:8%;box-shadow: 2px 4px #888888;background-color:#C4C4C4;border-radius:15px;margin-left:5%;margin-top:5%;" onclick="backtoView()">取消</button>      
+            </div>  
+            <div> <img src="https://livejapan.com/public/operation/spot/theme/fine-dining-restaurants/img/main2.jpg"class="photo3" ></div>           
+       </div>
+    </body>
+    <script type="text/javascript">
+		function loadOriginData(){
+			jsarray1 = JSON.parse(sessionStorage.getItem("modified_reserve"));
+			document.getElementById("datetime").innerHTML=jsarray1[2];
+	   		document.getElementById("num_of_people").innerHTML=jsarray1[3];
+	   		document.getElementById("name").innerHTML=jsarray1[1];
+	   		document.getElementById("note").innerHTML=jsarray1[6];
+		}
+		
+	    function DeleteReserve(){
+			jsarray1 = JSON.parse(sessionStorage.getItem("modified_reserve"));
+			var zero=0;
+			var data_object = {
+					"reserve_id": jsarray1[0],
+	                "user_id": zero,
+	                "name": "cancel",
+	                "phone_number": "cancel",
+	                "reserve_datetime_id": zero,
+	                "number_of_people": zero,
+	                "note":"cancel",
+	                "rate": zero,
+	                "checkin": zero
+			};
+	         // 將JSON格式轉換成字串
+	         var data_string = JSON.stringify(data_object);
+	         // 發出POST的PUT請求
+	         $.ajax({
+	                 type: "PUT",
+	                 url: "api/reserve.do",
+	                 data: data_string,
+	                 crossDomain: true,
+	                 cache: false,
+	                 dataType: 'json',
+	                 timeout: 5000,
+	                 success: function (response) {
+	                     if(response.status == 200){
+	                    	 getSeat();
+	                     }
+	                 },
+	                 error: function () {
+	                     alert("無法連線到伺服器！");
+	                 }
+	            });
+		}
+	    
+	    function backtoView(){
+    		jsarray1 = JSON.parse(sessionStorage.getItem("modified_reserve"));
+    		window.location.href='member_view_reservation.html?'+jsarray1[0];
+    	}
+	    
+	    function getSeat(){
+	    	var data = JSON.parse(sessionStorage.getItem("modified_reserve"));
+	    	var datetime_id = data[8];
+	    	var haveseat = data[3];
+	    	var data_object = {
+	                "reserve_datetime_id": datetime_id
+	            };
+            // 發出POST的AJAX請求
+            $.ajax({
+                    type: "GET",
+                    url: "api/reservedatetime.do",
+                    data: data_object,
+                    crossDomain: true,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                    	var outuserdata=JSON.stringify(response.response.data);
+                    	var fixoutuserdata=outuserdata.replace('[','');
+                    	var fixoutuserdata=fixoutuserdata.replace(']','');
+                    	outuserdata=JSON.parse(fixoutuserdata);
+                    	var newseat=haveseat+parseInt(outuserdata['available_seat_number']);
+                        jsarray=[data[8],data[2],newseat];
+                        sessionStorage.setItem("give_back_seat", JSON.stringify(jsarray));
+                   	 	addSeat();
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+            });
+	    	
+		}
+	    
+	    function addSeat(){
+	    	var data = JSON.parse(sessionStorage.getItem("give_back_seat"));
+	    	var data_object = {
+		            "reserve_datetime_id": data[0],
+		            "reserve_datetime": data[1],
+		            "seat": data[2]
+		        };
+			var data_string=JSON.stringify(data_object);
+	        // 發出POST的AJAX請求
+	        $.ajax({
+	                type: "PUT",
+	                url: "api/reservedatetime.do",
+	                data: data_string,
+	                crossDomain: true,
+	                cache: false,
+	                dataType: 'json',
+	                timeout: 5000,
+	                success: function (response) {
+                       	if(response.status == 200){
+                       	 	alert("刪除成功");
+                       	 	sessionStorage.removeItem("modified_reserve");
+                       	 	sessionStorage.removeItem("give_back_seat");
+                       	 	window.location.href="member_reservation.html";
+                       	}
+	                },
+	                error: function () {
+	                    alert("無法連線到伺服器！");
+	                }
+	        });
+	    	
+	    }
+	</script>
+</html>

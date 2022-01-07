@@ -1,0 +1,114 @@
+<html>
+
+<head>
+    <title>Admin Edit AllTime</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+
+<link rel=stylesheet type="text/css" href="mystyle.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<header>
+    <button class="button-back">
+        檢視所有時段
+    </button>
+</header>
+
+<body onload="getAllDatetime()">
+	<div>
+		<table id="table" class="admin-table" align="center">
+	        <thead align="center">
+	            <tr>
+	            	<th>Datetime ID</th>
+	                <th>時段</th>
+	                <th>人數</th>
+	                <th>刪除/修改</th>
+	            </tr>
+	        </thead>
+	        <tbody align="center">
+	        </tbody>
+    	</table>
+	</div>
+	<div style="position: fixed;left: 50%;bottom: 20px;transform: translate(-50%, -50%);margin: 0 auto;">
+		<button class="btn_back" onclick="window.location.href='admin_center.html'">返回</button>
+	</div>	
+</body>
+<script type="text/javascript">
+	function getAllDatetime() {
+	    $.ajax({
+	    type: "GET",
+	    url: "api/reservedatetime.do",
+	    crossDomain: true,
+	    cache: false,
+	    dataType: 'json',
+	    timeout: 5000,
+	    success: function (response) {
+	      if (JSON.stringify(response.status) === '"200"') {
+	    	var data=response.response.data;
+	        addDatetime(data);
+	      }
+	    },
+	    error: function () {
+	        alert("無法連線到伺服器！");
+	        }
+	    });
+	}
+	
+	function addDatetime(data) {
+	   var reservedatetime_html = '';
+	   var delete_btn ='<button class="btn_delete" onclick="goToDelete()">刪除</button>';
+	   var modify_btn ='<button class="btn_revise" onclick="goToModify()">修改</button>';
+	   if(data==="[{}]"){
+		   reservedatetime_html += '<tr><td>None</td>';
+		   reservedatetime_html += '<td>None</td>';
+		   reservedatetime_html += '<td>None</td>';
+		   reservedatetime_html += '<td>None</td></tr>';
+		}
+	   else{
+		   $.each(data, function(index, value) {
+			   reservedatetime_html += '<tr><td>' + value['reserve_datetime_id'] + '</td>';
+			   reservedatetime_html += '<td>' + value['available_datetime'] + '</td>';
+			   reservedatetime_html += '<td>' + value['available_seat_number'] + '</td>';
+			   reservedatetime_html += '<td><button onclick="goToModify('+value['reserve_datetime_id']+')" class="btn_revise">修改</button><button class="btn_delete" onclick="goToDelete('+value['reserve_datetime_id']+')">刪除</button></tr>';
+	       }) 
+	   }
+	   reservedatetime_html += '<tr><td colspan="7"><button onclick="newTime()">新增</button></td></tr>';
+	   $("#table > tbody").append(reservedatetime_html);
+	}
+	
+	function goToDelete(id){
+		var data_object = {
+                "reserve_datetime_id":id,
+        };
+		var data_string = JSON.stringify(data_object);
+		$.ajax({
+            type: "DELETE",
+            url: "api/reservedatetime.do",
+            data: data_string,
+            crossDomain: true,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response){
+            	var status=JSON.stringify(response.status);
+            	if(status==='"200"'){
+            		alert("刪除成功");
+					window.location.href='admin_edit_reservedatetime.html';	
+            	} 		
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+    	});
+	}
+	function goToModify(id){
+		window.location.href='time_edit_page_for_manager.html?'+id;
+	}
+	function newTime(){
+		window.location.href='new_time_page.html';
+	}
+</script>
+
+</html>

@@ -1,0 +1,54 @@
+<html>
+
+<head>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Login Page</title>
+
+    <title>Member Page</title>
+
+    <link rel=stylesheet type="text/css" href="mystyle.css">
+</head>
+
+
+<header>
+    <button class="button-back" onclick="window.location.href='view_member_login.html'">
+        <p>瀏覽餐廳資訊</p>
+    </button>
+</header>
+
+<body>
+    <table class="manager-center" cellpadding=5 align=center>
+        <tr>
+            <td colspan=2 align=center>
+                <font size=24><b>Member Center</b></font>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <a href="member_file.html">
+                    <button class="manager-center-button">
+                        檢視會員資料
+                    </button>
+                </a>
+
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <a href="member_reservation.html">
+                    <button class="manager-center-button">檢視訂位</button>
+                </a>
+
+            </td>
+        </tr>
+
+    </table>
+    <button id="fixedbutton" onclick="Logout();window.location.href='log_in.html';">登出</button>
+</body>
+<script type="text/javascript">
+	function Logout(){
+		sessionStorage.removeItem('user');
+	}
+</script>
+</html>

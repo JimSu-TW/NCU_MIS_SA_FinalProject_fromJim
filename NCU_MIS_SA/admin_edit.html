@@ -1,0 +1,171 @@
+<html>
+
+<head>
+    <title>Admin Edit</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.0.2/sha.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+
+<link rel=stylesheet type="text/css" href="mystyle.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<header>
+    <label class="label-back">
+        檢視所有管理者
+    </label>
+</header>
+
+<body onload="getAllManager()">
+	<div>
+		<table id="table" class="admin-table" align="center">
+	        <thead align="center">
+	            <tr>
+	                <th>Manager ID</th>
+	                <th>權限</th>
+	                <th>刪除/修改 </th>
+	            </tr>
+	        </thead>
+	        <tbody align="center">
+	        </tbody>
+	    </table>
+	</div>
+    <div style="position: fixed;left: 50%;bottom: 20px;transform: translate(-50%, -50%);margin: 0 auto;">
+    	<button onclick="window.location.href='admin_center.html'">返回</button>
+    </div>
+</body>
+<script type="text/javascript">
+	function getAllManager() {
+	    $.ajax({
+	    type: "GET",
+	    url: "api/manager.do",
+	    crossDomain: true,
+	    cache: false,
+	    dataType: 'json',
+	    timeout: 5000,
+	    success: function (response) {
+	      if (response.status == 200) {
+	    	var data=response.response.data;
+	        addManager(data);
+	      }
+	    },
+	    error: function () {
+	        alert("無法連線到伺服器！");
+	        }
+	    });
+	}
+	
+	function addManager(data) {
+	   jsarray1 = JSON.parse(sessionStorage.getItem("manager"));
+	   var manager_id = jsarray1[0];
+	   var manager_html = '';
+	   if(data==="[{}]"){
+		   manager_html += '<tr><td>None</td>';
+		   manager_html += '<td>None</td></tr>';
+		}
+	   else{
+		   $.each(data, function(index, value) {
+			   manager_html += '<tr><td>' + value['manager_id'] + '</td>';
+			   manager_html += '<td>' + value['root'] + '</td>';
+			   if(value['manager_id']==1 && manager_id==1){
+				   manager_html += '<td><button onclick="goModify('+value['manager_id']+','+value['root']+')">修改</button></td></tr>';
+			   }
+			   else if(value['manager_id']==1){
+				   manager_html += '<td>不能更動</td></tr>';
+			   }
+			   else if(value['manager_id']==manager_id){
+				   manager_html += '<td><button onclick="goModify('+value['manager_id']+','+value['root']+')">修改</button></td></tr>'; 
+			   }
+			   else{
+				   manager_html += '<td><button onclick="goModify('+value['manager_id']+','+value['root']+')">修改</button><button onclick="goDelete('+value['manager_id']+')">刪除</button></td></tr>';
+			   }
+	       }) 
+	   }
+	   manager_html += '<tr><td colspan="7"><nobr>請輸入新管理者權限：&nbsp;</nobr><input id="new_manager_root" type="number" min="0" max="1" name="newroot" style="width: 40px;"></input><nobr>&nbsp;&nbsp;請輸入密碼：&nbsp;</nobr><input id="new_manager_pwd" type="password" name="newpwd" size="10"></input><nobr>&nbsp;&nbsp;&nbsp;顯示密碼&nbsp;</nobr><input type="checkbox" onclick="showPwd()"><nobr>&nbsp;&nbsp;&nbsp;</nobr><button onclick="addNew()">新增</button></td></tr>';
+	   $("#table > tbody").append(manager_html);
+	}
+	
+	function addNew(){
+		var root=document.getElementById("new_manager_root").value;
+		var pwd=document.getElementById("new_manager_pwd").value;
+		if(root==="" || pwd===""){
+			alert("不能為空值");
+		}
+		else if(root==0 || root==1){
+			var data_object = {
+                    "password":HashPwd(pwd),
+                    "root":root
+            };
+			var data_string = JSON.stringify(data_object);
+			$.ajax({
+	            type: "POST",
+	            url: "api/manager.do",
+	            data: data_string,
+	            crossDomain: true,
+	            cache: false,
+	            dataType: 'json',
+	            timeout: 5000,
+	            success: function (response){
+	            	var status=JSON.stringify(response.status);
+	            	if(status==='"200"'){
+	            		alert("註冊成功");
+						window.location.href='admin_center.html';	
+	            	} 		
+	            },
+	            error: function () {
+	                alert("無法連線到伺服器！");
+	            }
+	    	});
+		}
+		else{
+			alert("值應為0或1");
+		}
+	}
+	function showPwd() {
+        var x = document.getElementById("new_manager_pwd");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+	
+	function goModify(id,root){
+		window.location.href="manager_edit_page.html?"+id+"&"+root;
+	}
+	
+	function goDelete(manager_id){
+		var data_object = {
+                "manager_id":manager_id,
+        };
+		var data_string = JSON.stringify(data_object);
+		$.ajax({
+            type: "DELETE",
+            url: "api/manager.do",
+            data: data_string,
+            crossDomain: true,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response){
+            	var status=JSON.stringify(response.status);
+            	if(status==='"200"'){
+            		alert("刪除成功");
+					window.location.href='admin_edit.html';	
+            	} 		
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+    	});
+	}
+	
+	function HashPwd(pwd) {
+  	  var hashObj = new jsSHA("SHA-256", "TEXT", {numRounds: 1});
+  	  hashObj.update(pwd);
+  	  var hash = hashObj.getHash("HEX");
+  	  return hash;
+ 	}
+</script>
+</html>

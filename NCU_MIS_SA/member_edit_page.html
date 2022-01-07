@@ -1,0 +1,140 @@
+<html>
+
+<head>
+    <title>Member File Page</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.0.2/sha.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel=stylesheet type="text/css" href="mystyle.css">
+</head>
+
+
+<header>
+    <label class="label-back">
+        檢視會員資料
+    </label>
+</header>
+
+<body onload="getMemberData()">
+    <table class="member-file" cellpadding=5 align=center>
+        <tr>
+            <td align=center>
+                <font size="3">會員姓名</font>
+            </td>
+            <td><p size=40 id="username" ></p></td>
+        </tr>
+
+        <tr>
+            <td align=center>
+                <font size="3">電子信箱</font>
+            </td>
+            <td><p size=40 id="email"></p></td>
+        </tr>
+        <tr>
+            <td align=center>
+                <font size="3">新密碼</font>
+            </td>
+            <td><input type="password" size=40 id="new_pwd" value=""></td>
+        </tr>
+        <tr>
+            <td align=center>
+                <font size="3">確認密碼</font>
+            </td>
+            <td><input type="password" size=40 id="again_pwd" value=""></td>
+        </tr>
+        <tr>
+        	<td align=center>
+                <font size="3">顯示密碼</font>
+            </td>
+        	<td><input type="checkbox" onclick="showPwd()"></td>
+        </tr>
+    </table>
+    <ul id="ul_top_hyper">
+        <li>
+            <button onclick="compareTwoPwd()">確認修改</button>
+        </li>
+
+        <li>
+            <button onclick="backToFile()">取消</button>
+        </li>
+    </ul>
+</body>
+<script type="text/javascript">
+	function getMemberData(){
+		jsarray=JSON.parse(sessionStorage.getItem("user"));
+		document.getElementById("username").innerHTML=jsarray[2];
+		document.getElementById("email").innerHTML=jsarray[1];
+	}
+	
+	function compareTwoPwd(){
+		var new_pwd=document.getElementById("new_pwd").value;
+		var again_pwd=document.getElementById("again_pwd").value;
+		
+		if(new_pwd==="" || again_pwd===""){
+			alert("不能為空值");
+		}
+		else if(new_pwd===again_pwd){
+			jsarray1 = JSON.parse(sessionStorage.getItem("user"));
+    		var data_object = {
+                    "user_id": jsarray1[0],
+                    "email": jsarray1[1],
+                    "name": jsarray1[2],
+                    "pwd": HashPwd(new_pwd),                  
+                };
+                
+             // 將JSON格式轉換成字串
+             var data_string = JSON.stringify(data_object);;
+             // 發出POST的PUT請求
+             $.ajax({
+                     type: "PUT",
+                     url: "api/member.do",
+                     data: data_string,
+                     crossDomain: true,
+                     cache: false,
+                     dataType: 'json',
+                     timeout: 5000,
+                     success: function (response) {
+                         $('#flashMessage').html(response.message);
+                         $('#flashMessage').show();
+                         if(response.status == 200){
+                        	 alert("修改成功");
+                        	 backToFile();
+                         }
+                     },
+                     error: function () {
+                         alert("無法連線到伺服器！");
+                     }
+                });
+		}
+		else{
+			alert("兩次密碼不一致");
+		}
+	}
+	
+	function backToFile(){
+		window.location.href="member_file.html";
+	}
+	
+    function showPwd() {
+        var x = document.getElementById("new_pwd");
+        var y = document.getElementById("again_pwd");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+        if (y.type === "password") {
+            y.type = "text";
+        } else {
+            y.type = "password";
+        }
+    }
+    
+    function HashPwd(pwd) {
+  	  var hashObj = new jsSHA("SHA-256", "TEXT", {numRounds: 1});
+  	  hashObj.update(pwd);
+  	  var hash = hashObj.getHash("HEX");
+  	  return hash;
+ 	}
+</script>
+</html>

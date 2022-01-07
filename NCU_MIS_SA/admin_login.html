@@ -1,0 +1,137 @@
+<html>
+
+<head>
+    <title>Sign In</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.0.2/sha.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<link rel=stylesheet type="text/css" href="mystyle.css">
+<header>
+   <button onclick="window.location.href='index.html'" class="button-back">
+       瀏覽餐廳資訊
+   </button>
+
+</header>
+
+<body>
+       <table align="center" cellpadding="15">
+           <tr>
+               <td>
+                   <center>
+                       <font size="3">管理者帳號</font>
+                   </center>
+               </td>
+               <td><input type="text" size=20 id="manager_id"></td>
+           </tr>
+
+           <tr>
+               <td align=right>
+
+                   <font size="3">密碼</font>
+
+               </td>
+               <td><input type="password" size=40 id="pwd"></td>
+           </tr>
+           <tr>
+               <td>
+
+               </td>
+               <td>
+                   <input type="checkbox" onclick="showPwd()">
+                   <label align=center>顯示密碼</label>
+               </td>
+           </tr>
+           <tr>
+               <td>
+
+               </td>
+               <td align=center>
+                   <button type="button" onclick="managerLogin()">登入</button>
+               </td>
+           </tr>
+
+       </table>
+</body>
+
+<script type="text/javascript">
+
+    function showPwd() {
+        var x = document.getElementById("pwd");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+    
+    function managerLogin(){
+        var manager_id = document.getElementById("manager_id").value;
+        var pwd = document.getElementById("pwd").value;
+
+		if(pwd===""){
+       		alert("請輸入密碼");
+       	}
+     	else {
+        	// 將資料組成JSON格式
+            var data_object = {
+                "manager_id": manager_id
+        	}
+            // 發出POST的AJAX請求
+            $.ajax({
+                    type: "GET",
+                    url: "api/manager.do",
+                    data: data_object,
+                    crossDomain: true,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                    	var fix_response=JSON.stringify(response.response.row);
+                    	if(fix_response==="0"){
+                    		alert("無此管理員");
+                    	}
+                    	else{
+                    		var outuserdata=JSON.stringify(response.response.data);
+                        	var fixoutuserdata=outuserdata.replace('[','');
+                        	var fixoutuserdata=fixoutuserdata.replace(']','');
+                        	var out_password=JSON.parse(fixoutuserdata).password;
+                        	var root = JSON.parse(fixoutuserdata).root;
+                            delay(2000);
+                        	if(HashPwd(document.getElementById("pwd").value)===out_password){
+                        		alert("登入成功");
+                        		setManagerData(manager_id,root);
+                        		window.location.href="admin_center.html";
+                        	}
+                            else{
+                                alert("登入失敗");
+                                window.location.href="log_in.html";
+                            }
+                    	}
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+            });
+        }
+    }
+
+    function delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+    
+    function setManagerData(manager_id,root){
+        jsarray=[manager_id,root];
+        sessionStorage.setItem("manager", JSON.stringify(jsarray));
+    }
+    
+    function HashPwd(pwd) {
+    	  var hashObj = new jsSHA("SHA-256", "TEXT", {numRounds: 1});
+    	  hashObj.update(pwd);
+    	  var hash = hashObj.getHash("HEX");
+    	  return hash;
+   	}
+</script>
+
+</html>

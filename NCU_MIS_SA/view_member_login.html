@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+         <script src="statics/js/jquery-3.4.1.min.js"></script>
+         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+         <link rel="stylesheet" href="mystyle2.css">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+         <title>view the restaurant</title>
+    </head>
+    <body onload="getData()">
+         <div class="header">
+            <div class="title">瀏覽餐廳資訊</div>
+            <button style=" width: 150px;height: 50px;background-color:#DACFC3;left:88%;margin-top:0;top:23%;position:absolute" onclick="window.location.href='member_center.html'">會員中心</button>      
+       
+            <img src="https://livejapan.com/public/operation/spot/theme/fine-dining-restaurants/img/main2.jpg" class="photo">
+       
+         </div>
+       
+         <div><br><br></div>
+            <div class="color-introduction">
+               <p class="word_header">簡介:</p>
+               <div>
+          		<p id="brief_desc" class="content"></p>
+          	  </div>
+              <p class="word_header" style="margin-top:0;position:relative;">營業時間:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;地址:</p>
+              <div class="content">
+              <span id="mon_address"></span>
+              <br>
+              <span id="Tue"></span>
+              <br>
+              <span id="Wed"></span>
+              <br>
+              <span id="Thu"></span>
+              <br>
+              <span id="Fri"></span>
+              <br>
+              <span id="Sat"></span>
+              <br>
+              <span id="Sun"></span>
+              <br>
+              <span id="Hol"></span>        
+          </div>
+             
+               <button style="width:15%;height:8%;box-shadow: 2px 4px #888888;background-color:#D7D975;border-radius:15px;left:75%;margin-top:0;top:70%;position:absolute;" onclick="window.location.href='menu2.html'">菜單</button>      
+         
+
+               <button style="width:15%;height:8%;box-shadow: 2px 4px #888888;background-color:#D89343;border-radius:15px;left:75%;margin-top:0;top:80%;position:absolute" onclick="window.location.href='view_the_time_login.html'">訂位</button>      
+         </div>
+    </body>
+    <script type="text/javascript">
+    	function getData(){
+	    	document.getElementById("mon_address").innerHTML=localStorage.getItem('mon');
+	    	document.getElementById("Tue").innerHTML=localStorage.getItem('tue');
+	    	document.getElementById("Wed").innerHTML=localStorage.getItem('wed');
+	    	document.getElementById("Thu").innerHTML=localStorage.getItem('thu');
+	    	document.getElementById("Fri").innerHTML=localStorage.getItem('fri');
+	    	document.getElementById("Sat").innerHTML=localStorage.getItem('sat');
+	    	document.getElementById("Sun").innerHTML=localStorage.getItem('sun');
+	    	document.getElementById("Hol").innerHTML=localStorage.getItem('hol');
+	    	document.getElementById("brief_desc").innerHTML=localStorage.getItem('brief_desc');
+	    }
+    </script>
+</html>

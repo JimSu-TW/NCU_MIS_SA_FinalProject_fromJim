@@ -1,0 +1,217 @@
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-color: #9597AC;
+}
+body{
+    overflow-y: hidden;
+}
+.title {
+    list-style-type: none;
+    width: 150px;
+    height: 50px;
+    margin-left: 10px;
+    margin-top: 23px;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    background-color: #C4C4C4;
+}
+.header_check {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background-color: #D89343;
+    text-align: center;
+}
+.title2{
+    list-style-type: none;
+    font-size: 25px;
+    color: white;
+}
+.booking, .editing{
+    border: 5px solid #d6d6d6;
+    background-color:#ffffff;
+    border-radius: 35px;
+    width: 80%;
+    height: 80%;
+    margin: 9% auto;
+
+    
+}
+
+.background_1{
+    margin-left: 150px;
+    margin-right: auto;
+    margin-top:8%;
+    margin-bottom:50px;
+    height:650px;
+    width:1210px;
+    line-height:50px;
+    background-color:#F0F0F0;
+    border-radius:61px;
+    text-align:left;
+    margin-right:50px;
+    box-shadow: 2px 2px 4px 4px #888888;
+    z-index:1;
+}
+.check{
+    position: absolute;
+    left:50%;
+    transform: translate(-50%,0);
+    padding-top: 80px;
+}
+.check>form>div{
+    padding: 2px 20px;
+    margin: 5% auto;
+}
+.booking-footer{
+    position: fixed;
+    bottom: 50px;
+    right: 20%;
+}
+.booking li{
+    display: inline;
+    margin-left: 25px;
+    margin-right: 25px;
+    padding: 20px;
+}
+#bookingbtn{
+    background-color: #D7D975;
+    font-size: medium;
+    width:100px;
+    height:35px;
+    box-shadow: 2px 4px #888888;
+    border-radius:15px;
+}
+#bookingbtn:disabled{
+    background-color: RGBA(22,18,38,0.25);
+    font-size: medium;
+    width:100px;
+    height:35px;
+    box-shadow: 2px 4px #888888;
+    border-radius:15px;
+}
+#booking-editbtn{
+    background-color: #C9A7A7;
+    font-size: medium;
+    width:100px;
+    height:35px;
+    box-shadow: 2px 4px #888888;
+    border-radius:15px;
+}
+
+.container-l, .container-r{
+    display: inline-block;
+    width: 49%;
+    float: left;
+}
+
+.container-l>div>label, .container-r>div>label {
+    margin-left: 15px;
+    display: block;
+    padding: 10px 0px;
+    width: 100%;
+    font-size: large;
+    color: #967F65;
+}
+input, textarea{
+    border-color: #967F65;
+    border-width: 1px;
+}
+.container-l>div, .container-r>div{
+    padding: 20px 20px;
+}
+.booking-l, .booking-r{
+    display: inline-block;
+    width: 49%;
+    float: left;
+}
+p {
+    color: #425E89;
+    font-size: 20;
+    font-family:"Lucida Console", Monospace;
+}
+form{
+    margin: 0px auto;
+}
+.booking-table {
+    top: 150px;
+    position: relative;
+    width: 85%;
+    border: 2px solid black;
+    border-collapse: collapse;
+    padding: 5px;
+}
+
+.booking-table th {
+    width: auto;
+    border: 2px solid #C0C0C0;
+    padding: 5px;
+    background: #F0F0F0;
+}
+
+.booking-table td {
+    width: auto;
+    border: 2px solid #C0C0C0;
+    text-align: center;
+    padding: 5px;
+}
+.modal-footer-manager{
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%,0)
+}
+.modal-footer-manager li{
+    display: inline;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+.footer_btn1{
+    background-color: #EAB464;
+    width: 100px;
+    font-size: large;
+}
+.footer_btn2{
+    background-color: #DACFC3;
+    width: 100px;
+    font-size: large;
+}
+.modal-footer-member{
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%,0)
+}
+.delete_btn{
+    background-color: #D7D975;
+}
+.cancel_btn{
+    background-color: #C9A7A7;
+}
+.edit-footer{
+    position: fixed;
+    bottom: 40px;
+    right: 20%;
+}
+.edit-footer li{
+    display: inline;
+    margin-left: 25px;
+    margin-right: 25px;
+    padding: 20px;
+}
+#edit-reservation1 {
+    background-color: #D89343;
+    font-size: medium;
+}
+#edit-reservation2 {
+    background-color: #9597AC;
+    font-size: medium;
+}
+

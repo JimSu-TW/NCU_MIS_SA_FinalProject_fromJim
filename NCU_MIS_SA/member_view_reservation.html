@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="statics/js/jquery-3.4.1.min.js"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" href="mystyle2.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+        <title>檢視訂位</title>
+    </head>
+    <body onload="getReserveId()">
+        <div class="header">
+            <div class="title">檢視訂位</div>
+             
+        </div>
+        <div><br><br></div>
+        <div class="background_1">
+            <div class="background_5">
+                <div style=" width: 140px;height: 35px;margin-left: 40%;margin-top:1%;display: grid;text-align:center;line-height:35px;place-items: center;background-color: #EAB464;">檢視訂位內容
+                </div>
+                <label for="預計日期" style="margin-top:5%; margin-left:20%;position:absolute;">
+                    <b>預計日期時段</b>
+                </label>
+                <div style="width: 380px; height: 15px; padding: 5px; text-align: center;margin-left:20%;margin-top:12%;">
+                    <p id="datetime" style="position:absolute;top:20%;left:20%;"></p>
+                </div>
+
+                <label for="用餐人數" style="margin-top:2%; margin-left:20%;position:absolute;">
+                    <b>用餐人數</b>
+                </label>
+                <div style="width: 380px; height: 15px; border-color: #967F65; padding: 5px; text-align: center;margin-left:20%;margin-top:8%;">
+                    <p id="number_of_people" style="position:absolute;top:36%;left:20%;"></p>
+                </div>
+                <label for="姓名" style="margin-top:2%; margin-left:20%;position:absolute;">
+                    <b>姓名</b>
+                </label>
+                <div style="width: 380px; height: 15px; border-color: #967F65; padding: 5px; text-align: center;margin-left:20%;margin-top:8%;">
+                    <p id="name" style="position:absolute;top:53%;left:20%;"></p>
+                </div>
+                <label for="備註" style="margin-top:2%; margin-left:20%;position:absolute;">
+                    <b>備註</b>
+                </label>
+                <div style=" width: 380px; height: 50px; border-color: #967F65; padding: 5px; text-align: center;margin-left:20%;margin-top:8%;">
+                    <p id="note" style="position:absolute;top:68%;left:20%;"></p>
+                </div>
+
+                <button style="width:12%;height:8%;box-shadow: 2px 4px #888888;background-color:#D89343;border-radius:15px;margin-left:30%;margin-top:1.5%;" onclick="window.location.href='modify_reservation.html'">修改</button>      
+                <button style="width:12%;height:8%;box-shadow: 2px 4px #888888;background-color:#B59090;border-radius:15px;margin-left:5%;margin-top:1.5%;" onclick="window.location.href='delete_reservation.html'">刪除</button>      
+                <button style="width:12%;height:8%;box-shadow: 2px 4px #888888;background-color:#C4C4C4;border-radius:15px;margin-left:6%;margin-top:1.5%;" onclick="clearModified()">返回</button>      
+
+            </div>  
+        </div>  
+    </body>
+    <script type="text/javascript">
+        function getReserveId(){
+            var url = new URL(window.location.href);
+            var reserve_id=url.toString().slice(url.toString().search("html?")+5);
+            var data_object = {
+                    "reserve_id": reserve_id
+                };
+            $.ajax({
+                type: "GET",
+                url: "api/reserve.do",
+                data: data_object,
+                crossDomain: true,
+                cache: false,
+                dataType: 'json',
+                timeout: 5000,
+                success: function (response) {
+                    var data = response.response.data;
+                    var datetime = data["reserve_datetime"];
+                    var number_of_people = data["number_of_people"];
+                    var name = data["name"];
+                    var note = data["note"];
+                    document.getElementById("datetime").innerHTML=datetime;
+                    document.getElementById("number_of_people").innerHTML=number_of_people;
+                    document.getElementById("name").innerHTML=name;
+                    document.getElementById("note").innerHTML=note;
+                    jsarray=[reserve_id,name,datetime,number_of_people,data['phone_number'],data['email'],note,data['user_id'],data['reserve_datetime_id']];
+                    sessionStorage.setItem("modified_reserve", JSON.stringify(jsarray));
+                },
+                error: function () {
+                    alert("無法連線到伺服器！");
+                }
+            });
+        }
+        function clearModified(){
+            sessionStorage.removeItem("modified_reserve");
+            window.location.href='member_reservation.html';
+        }
+    </script>
+</html>

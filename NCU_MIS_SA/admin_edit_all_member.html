@@ -1,0 +1,256 @@
+<html>
+
+<head>
+    <title>Admin Edit All Member</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<link rel=stylesheet type="text/css" href="mystyle.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<header>
+    <button class="button-back">
+        檢視所有會員
+    </button>
+</header>
+
+<body onload="getAllMember()">
+	<div>
+		<table id="table" class="admin-table" align="center">
+	        <thead align="center">
+	            <tr>
+	            	<th>User ID</th>
+	                <th>姓名</th>
+	                <th>信箱</th>
+	                <th>刪除/修改</th>
+	            </tr>
+	        </thead>
+	        <tbody align="center">
+	        </tbody>
+    	</table>
+	</div>
+	<div style="position: fixed;left: 50%;bottom: 20px;transform: translate(-50%, -50%);margin: 0 auto;">
+		<button class="btn_back" onclick="window.location.href='admin_center.html'">返回</button>
+	</div>	
+</body>
+<script type="text/javascript">
+	function getAllMember() {
+	    $.ajax({
+	    type: "GET",
+	    url: "api/member.do",
+	    crossDomain: true,
+	    cache: false,
+	    dataType: 'json',
+	    timeout: 5000,
+	    success: function (response) {
+	      if (JSON.stringify(response.status) === '"200"') {
+	    	var data=response.response.data;
+	        addMember(data);
+	      }
+	    },
+	    error: function () {
+	        alert("無法連線到伺服器！");
+	        }
+	    });
+	}
+	
+	function addMember(data) {
+	   var member_html = '';
+	   if(JSON.stringify(data)==="[{}]"){
+		   member_html += '<tr><td>None</td>';
+		   member_html += '<td>None</td>';
+		   member_html += '<td>None</td>';
+		   member_html += '<td>None</td></tr>';
+		}
+	   else{
+		   $.each(data, function(index, value) {
+			   member_html += '<tr><td>' + value['user_id'] + '</td>';
+			   member_html += '<td>' + value['name'] + '</td>';
+			   member_html += '<td>' + value['email'] + '</td>';
+			   member_html += '<td><button onclick="goToModify(\''+value['email']+'\')" class="btn_revise">修改</button><button class="btn_delete" onclick="getMemberAllReserve('+value['user_id']+')">刪除</button></tr>';
+	       }) 
+	   }
+	   $("#table > tbody").append(member_html);
+	}
+	
+	function goToDelete(user_id){
+		var data_object = {
+                "user_id":user_id,
+        };
+		var data_string = JSON.stringify(data_object);
+		$.ajax({
+            type: "DELETE",
+            url: "api/member.do",
+            data: data_string,
+            crossDomain: true,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response){
+            	var status=JSON.stringify(response.status);
+            	if(status==='"200"'){
+            		alert("刪除成功");
+					window.location.href='admin_edit_all_member.html';	
+            	} 		
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+    	});
+	}
+	
+	 function getMemberAllReserve(id) {
+         var data_object = {
+             "user_id": id
+         };
+         $.ajax({
+         type: "GET",
+         url: "api/reserve.do",
+         data: data_object,
+         crossDomain: true,
+         cache: false,
+         dataType: 'json',
+         timeout: 5000,
+         success: function (response) {
+	       if (response.status == 200) {
+	         	var data=response.response.data;
+	         	for(var i=0;i<data.length;i++){
+	   			 	getReserveData(data[i]['reserve_id']);
+	   			 	delay(1000);
+	   		 	}
+	         	goToDelete(id);
+           }
+         },
+         error: function () {
+             alert("1無法連線到伺服器！");
+             }
+         });
+    }
+	 
+	function goToModify(email){
+		window.location.href='member_edit_page_for_manager.html?'+email;
+	}
+	
+	 function getReserveData(id){
+		   var data_object = {
+                 "reserve_id": id
+         };
+         $.ajax({
+             type: "GET",
+             url: "api/reserve.do",
+             data: data_object,
+             crossDomain: true,
+             cache: false,
+             dataType: 'json',
+             timeout: 5000,
+             success: function (response) {
+                 var data = response.response.data;
+                 var datetime = data["reserve_datetime"];
+                 var number_of_people = data["number_of_people"];
+                 var datetime_id = data['reserve_datetime_id'];
+                 goDeleteByReserveId(id,datetime,number_of_people,datetime_id);
+             },
+             error: function () {
+                 alert("2無法連線到伺服器！");
+             }
+         });
+	   }
+	
+	
+	function goDeleteByReserveId(id,datetime,number_of_people,datetime_id){
+		   var data_object = {
+                "reserve_id": id,
+                "user_id": 0,
+                "name": "cancel",
+                "phone_number": "cancel",
+                "reserve_datetime_id": 0,
+                "number_of_people":0,
+                "rate":0,
+                "note":"cancel",
+                "checkin":0  
+        };
+		   var data_string = JSON.stringify(data_object);
+        $.ajax({
+            type: "PUT",
+            url: "api/reserve.do",
+            data: data_string,
+            crossDomain: true,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+                if(JSON.stringify(response.status) === '"200"'){
+             	   getSeat(datetime_id,datetime,number_of_people);
+                }
+            },
+            error: function () {
+                alert("3無法連線到伺服器！");
+            }
+        });
+    }
+	
+	function getSeat(id,datetime,num){
+    	var datetime_id = parseInt(id);
+    	var haveseat = parseInt(num);
+    	var data_object = {
+                "reserve_datetime_id": datetime_id
+            };
+       // 發出POST的AJAX請求
+       $.ajax({
+               type: "GET",
+               url: "api/reservedatetime.do",
+               data: data_object,
+               crossDomain: true,
+               cache: false,
+               dataType: 'json',
+               timeout: 5000,
+               success: function (response) {
+            	  var outuserdata=JSON.stringify(response.response.data);
+                  var fixoutuserdata=outuserdata.replace('[','');
+                  var fixoutuserdata=fixoutuserdata.replace(']','');
+                  outuserdata=JSON.parse(fixoutuserdata);
+               	  var newseat=haveseat+parseInt(outuserdata['available_seat_number']);
+              	  addSeat(datetime_id,datetime,newseat);
+               },
+               error: function () {
+                   alert("4無法連線到伺服器！");
+               }
+       });
+	}
+	
+	function addSeat(id,datetime,num){
+    	var data = JSON.parse(sessionStorage.getItem("give_back_seat"));
+    	var datetime_id=parseInt(id);
+    	var seat = parseInt(num);
+    	
+    	var data_object = {
+	            "reserve_datetime_id": parseInt(id),
+	            "reserve_datetime": datetime,
+	            "seat": seat
+	        };
+		var data_string=JSON.stringify(data_object);
+        // 發出POST的AJAX請求
+        $.ajax({
+                type: "PUT",
+                url: "api/reservedatetime.do",
+                data: data_string,
+                crossDomain: true,
+                cache: false,
+                dataType: 'json',
+                timeout: 5000,
+                success: function (response) {
+                  	if(response.status == 200){
+                        return;
+                  	}
+                },
+                error: function () {
+                    alert("5無法連線到伺服器！");
+                }
+        });
+    }
+	
+	function delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+</script>
+</html>

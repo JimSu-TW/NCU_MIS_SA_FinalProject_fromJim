@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <link rel="stylesheet" href = "mystyle3.css">
+        <title>確認訂位</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"> </script>
+    </head>
+    <body onload="loadFormData()">
+        <div class ="header">
+            <ul>
+                <span class= "title"><strong>確認訂位</strong></span>
+            </ul>
+        </div>
+        <div class="background_1">
+            
+                <div class="booking" style="position:absolute;top:5%;left:20%;width:60%;height:60%;">
+                    <div class="booking-l">
+                        <ul class = "main-l">
+                            <h4>預約日期時間</h4>
+                            <p id="datetime"></p>
+                            <h4>用餐人數</h4>
+                            <p id="num_of_people"></p>
+                            <h4>備註</h4>
+                            <p id="note"> </p>
+                        </ul>
+                    </div>
+                    <div class="booking-r">
+                        <ul class = "main-r">
+                            <h4>姓名</h4>
+                            <p id="name"></p>
+                            <h4>聯絡電話</h4>
+                            <p id="phone"></p>
+                            <h4>信箱</h4>
+                            <p id="email"></p>
+                            <div>
+                                <ul class = "booking-footer">
+                                    <li>
+                                        <button id = "bookingbtn" onclick = "window.location.href='reservation_check.html'" >
+                                            送出訂位
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <a href="edit_reservation.html"><button id="booking-editbtn">修改資料</button></a><!--改跳轉網頁名-->
+                                    </li>
+                                </ul>
+                            </div>
+                        </ul>
+                    </div>
+                </div>       
+        </div>
+        
+    </body>
+</html>
+<script type="text/javascript">
+    function loadFormData(){
+        jsarray1 = JSON.parse(sessionStorage.getItem("reserve_data"));
+        jsarray2 = JSON.parse(sessionStorage.getItem("user"));
+        document.getElementById("datetime").innerHTML=jsarray1[0];
+        document.getElementById("num_of_people").innerHTML=jsarray1[1];
+        document.getElementById("name").innerHTML=jsarray1[2];
+        document.getElementById("phone").innerHTML=jsarray1[3];
+        document.getElementById("note").innerHTML=jsarray1[4];
+        document.getElementById("email").innerHTML=jsarray2[1];
+    }
+</script>

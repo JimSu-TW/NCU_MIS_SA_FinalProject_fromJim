@@ -1,0 +1,93 @@
+<html>
+
+<head>
+    <title>Login Page</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <meta charset="utf-8">
+    <link rel=stylesheet type="text/css" href="mystyle.css">
+</head>
+
+
+<header>
+    <button class="button-back" onclick="window.location.href='view_manager.html'">
+        瀏覽餐廳資訊
+    </button>
+</header>
+
+<body>
+    <table class="manager-center" cellpadding=5 align=center>
+        <tr>
+            <td colspan=2 align=center>
+                <font size=24><b>Manager Center</b></font>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <button onclick="checkAuthforMember()" class="manager-center-button">
+                    檢視會員資料
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <button onclick="checkAuthforTime()" class="manager-center-button">
+                    檢視時段
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <button class="manager-center-button" onclick="window.location.href='admin_reservation.html'">
+                    檢視訂位
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+	            <button class="manager-center-button" onclick="checkAuth()">
+	                檢視管理員資料
+	            </button>
+            </td>
+        </tr>
+    </table>
+    <button id="fixedbutton" onclick="Logout();window.location.href='log_in.html'">登出</button>
+</body>
+<script type="text/javascript">
+	function Logout(){
+		sessionStorage.removeItem("manager");
+	}
+	
+	function checkAuthforTime(){
+		jsarray1 = JSON.parse(sessionStorage.getItem("manager"));
+		var root = jsarray1[1];
+		if(root===1){
+			window.location.href='admin_edit_reservedatetime.html';	
+		}
+		else{
+			alert("權限不足");
+		}
+	}
+	
+	function checkAuthforMember(){
+		jsarray1 = JSON.parse(sessionStorage.getItem("manager"));
+		var root = jsarray1[1];
+		if(root===1){
+			window.location.href='admin_edit_all_member.html';	
+		}
+		else{
+			alert("權限不足");
+		}
+	}
+	
+	function checkAuth(){
+		jsarray1 = JSON.parse(sessionStorage.getItem("manager"));
+		var root = jsarray1[1];
+		if(root===1){
+			window.location.href='admin_edit.html';	
+		}
+		else{
+			alert("權限不足");
+		}
+	}
+</script>
+</html>

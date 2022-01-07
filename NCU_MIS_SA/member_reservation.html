@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <link rel="stylesheet" href = "mystyle3.css">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="statics/js/jquery-3.4.1.min.js"></script>
+        <title>Member view</title>
+    </head>
+    <body onload="getMemberAllReserve()">
+        <div class ="header">
+            <ul>
+                <span class= "title"><strong>檢視訂位內容</strong></span>
+            </ul>
+        </div>
+        <table id="table" class="booking-table" align="center" border="1"> 
+            <thead  align="center">
+                <tr>
+                    <th>訂位編號</th>
+                    <th>姓名</th>
+                    <th>信箱</th>
+                    <th>電話</th>
+                    <th>預約時段</th>
+                    <th>備註</th>
+                </tr>
+            </thead>
+            <tbody align="center">
+            </tbody>
+        </table>
+        <div>
+            <ul class="modal-footer-member">
+                    <a href="member_center.html"><button class="footer_btn2">返回</button><!--跳轉memberrcenter頁面-->
+            </ul>
+        </div>
+    </body>
+    <script type="text/javascript">
+      function getMemberAllReserve() {
+            var id = JSON.parse(sessionStorage.getItem("user"))[0];
+            var data_object = {
+                "user_id": id
+            };
+            $.ajax({
+            type: "GET",
+            url: "api/reserve.do",
+            data: data_object,
+            crossDomain: true,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+              if (response.status == 200) {
+            	var data=response.response.data;
+            	addReserve(data);
+              }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+                }
+            });
+        }
+
+       function addReserve(data) {
+           var reserve_html = '';
+           if(data==="[{}]"){
+        	   reserve_html += '<tr><td>None</td>';
+        	   reserve_html += '<td>None</td>';
+        	   reserve_html += '<td>None</td>';
+        	   reserve_html += '<td>None</td>';
+        	   reserve_html += '<td>None</td>';
+        	   reserve_html += '<td>None</td></tr>';
+        	}
+           else{
+        	   $.each(data, function(index, value) {
+            	   reserve_html += '<tr><td>' + value['reserve_id'] + '</td>';
+            	   reserve_html += '<td>' + value['name'] + '</td>';
+            	   reserve_html += '<td>' + value['email'] + '</td>';
+            	   reserve_html += '<td>' + value['phone_number'] + '</td>';
+            	   reserve_html += '<td>' + value['reserve_datetime'] + '</td>';
+            	   if(value['checkin']=== 1){
+            		   reserve_html += '<td>' + value['note'] +'<a href="view_reservation_rate.html?'+value['reserve_id'] +'">...rate'+'</td></tr>'; 
+            		   
+            	   }
+            	   else{
+            		   reserve_html += '<td>' + value['note'] +'<a href="member_view_reservation.html?'+value['reserve_id'] +'">...more'+'</td></tr>';
+            	   }
+               }) 
+           }
+           $("#table > tbody").append(reserve_html);
+       }
+    </script>
+</html>

@@ -1,0 +1,222 @@
+<html>
+
+<head>
+    <title>重設密碼</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.0.2/sha.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<link rel=stylesheet type="text/css" href="mystyle.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<header>
+       <button class="button-back" disabled="disabled">
+           重設密碼
+       </button>
+</header>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+    <form name="signinForm" class="signin-form">
+        <table align="center" cellpadding="15">
+            <tr>
+                <td>
+                    <center>
+                        <font size="3">會員姓名</font>
+                    </center>
+                </td>
+                <td><input id="name" type="text" size=20 required></td>
+            </tr>
+            <tr>
+                <td>
+                    <center>
+                        <font size="3">電子信箱</font>
+                    </center>
+                </td>
+                <td><input type="email" size=40 id="email" name="email" required></td>
+            </tr>
+            <tr>
+                <td>
+                    <center>
+                        <font size="3">設定密碼</font>
+                    </center>
+                </td>
+                <td><input id="pwd1" type="password" size=40 required></td>
+            </tr>
+            <tr>
+                <td>
+                    <center>
+                        <font size="3">確認密碼</font>
+                    </center>
+                </td>
+                <td><input id="pwd2" type="password" size=40 required></td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                   <input type="checkbox" onclick="showPwd()">
+                   <label>顯示密碼&nbsp;&nbsp;&nbsp;</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+
+                </td>
+                <td>
+                    <button type="button" onclick="ResetPwd()">確認重設密碼</button>
+                    <button onclick="window.location.href='log_in.html'" type="button">取消</button>
+                </td>
+            </tr>
+
+        </table>
+    </form>
+</body>
+
+<script type="text/javascript">
+	function sendReset(data){
+		var data_string = JSON.stringify(data);
+            
+         // 發出POST的PUT請求
+         $.ajax({
+                 type: "PUT",
+                 url: "api/member.do",
+                 data: data_string,
+                 crossDomain: true,
+                 cache: false,
+                 dataType: 'json',
+                 timeout: 5000,
+                 success: function (response) {
+                     $('#flashMessage').html(response.message);
+                     $('#flashMessage').show();
+                     if(response.status == 200){
+                    	 alert("修改成功");
+                    	 sessionStorage.removeItem('temp_user');
+                    	 window.location.href="log_in.html";
+                     }
+                 },
+                 error: function () {
+                     alert("無法連線到伺服器！");
+                 }
+        });
+	}
+	
+	function ResetPwd(){
+		var email_rule = /^([\w\.\-]){1,64}\@([\w\.\-]){1,64}$/;
+		var name = document.getElementById("name").value;
+		var email = document.getElementById("email").value;
+		var pwd1 = document.getElementById("pwd1").value;
+		var pwd2 = document.getElementById("pwd2").value;
+		if(name===null || email===null || pwd1==="" || pwd2===""){
+			alert("資料不能為空值");
+		}
+		else{
+			if (!email_rule.test(email)) {
+	            alert("Email格式不符！");
+	        }
+			else if(pwd1===pwd2){
+				getData(email);
+			}
+	       	else{
+				alert("資料有誤");
+	       	}
+		}
+	}
+	
+    function showPwd() {
+        var x = document.getElementById("pwd1");
+        var y = document.getElementById("pwd2");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+        if (y.type === "password") {
+            y.type = "text";
+        } else {
+            y.type = "password";
+        }
+    }
+    
+    function getData(email){
+    	
+    	// 將資料組成JSON格式
+        var data_object = {
+            "email": email,
+        };
+        // 發出POST的AJAX請求
+        $.ajax({
+                type: "GET",
+                url: "api/member.do",
+                data: data_object,
+                crossDomain: true,
+                cache: false,
+                dataType: 'json',
+                timeout: 5000,
+                success: function (response) {
+                	var fix_response=JSON.stringify(response.response.row);
+                	if(fix_response==="0"){
+                		sessionStorage.removeItem('temp_user');
+                		alert("無此會員");
+                   	 	window.location.href="log_in.html";
+                	}
+                	else{
+                		var outuserdata=JSON.stringify(response.response.data);
+                    	var fixoutuserdata=outuserdata.replace('[','');
+                    	var fixoutuserdata=fixoutuserdata.replace(']','');
+                    	var name=JSON.parse(fixoutuserdata).name;
+                    	var user_id=JSON.parse(fixoutuserdata).user_id;
+                    	jsarray=[user_id,email,name];
+                        sessionStorage.setItem("temp_user", JSON.stringify(jsarray));
+                        checkNameMail();
+                	}
+                },
+                error: function () {
+                    alert("無法連線到伺服器！");
+                }
+        });
+    }
+    
+    function checkNameMail(){
+    	delay(2000);
+		var name = document.getElementById("name").value;
+		var email = document.getElementById("email").value;
+		var pwd1 = document.getElementById("pwd1").value;
+		var jsarray=JSON.parse(sessionStorage.getItem("temp_user"));
+		if(name===jsarray[2]){
+			var data_object = {
+				  "user_id": jsarray[0],
+                  "name": name,
+                  "email":email,
+                  "pwd":HashPwd(pwd1)
+            };
+			sendReset(data_object);
+		}
+		else{
+			alert("姓名不正確，無法重設密碼");
+			sessionStorage.removeItem('temp_user');
+       	 	window.location.href="log_in.html";
+		}
+    }
+    
+    function delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+    
+    function HashPwd(pwd) {
+    	  var hashObj = new jsSHA("SHA-256", "TEXT", {numRounds: 1});
+    	  hashObj.update(pwd);
+    	  var hash = hashObj.getHash("HEX");
+    	  return hash;
+   	}
+</script>
+
+</html>

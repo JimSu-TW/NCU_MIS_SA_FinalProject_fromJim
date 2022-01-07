@@ -1,0 +1,156 @@
+html,
+body {
+    height: 100%;
+    margin: 0 auto;
+}
+
+header {
+    padding: 15px;
+    width: auto;
+    color: black;
+    background-color: #9597ac;
+}
+
+.label-back {
+    list-style-type: none;
+    width: 150px;
+    height: 50px;
+    margin-left: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    background-color: #C4C4C4;
+}
+
+.button-back {
+    padding: 15px;
+    width: 100px;
+    background-color: gray;
+    text-align: center;
+}
+
+.login-form {
+    top: 30px;
+    width: 50%;
+    font-size: 18px;
+    font-family: serif;
+    background-color: white;
+    position: relative;
+    white-space: nowrap;
+    border-width: 3px;
+    border-style: solid;
+    border-color: black;
+    padding: 5px;
+    border-radius: 12px;
+}
+
+.signin-form {
+    position: relative;
+    top: 30px;
+    width: 100%;
+    font-size: 18px;
+    font-family: serif;
+    white-space: nowrap;
+}
+
+.manager-center {
+    top: 30px;
+    width: 80%;
+    font-size: 18px;
+    font-family: serif;
+    background-color: white;
+    position: relative;
+    white-space: nowrap;
+    border-width: 3px;
+    border-style: solid;
+    border-color: black;
+    padding: 5px;
+    border-radius: 12px;
+}
+
+.manager-center-button {
+    border: none;
+    width: 60%;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 32px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+    background-color: lightblue;
+}
+
+.member-file {
+    top: 30px;
+    width: 80%;
+    font-size: 18px;
+    font-family: serif;
+    background-color: white;
+    position: relative;
+    white-space: nowrap;
+    border-width: 3px;
+    border-style: solid;
+    border-color: black;
+    padding: 5px;
+}
+
+.admin-table {
+    top: 30px;
+    position: relative;
+    width: 85%;
+    border: 2px solid black;
+    border-collapse: collapse;
+    padding: 5px;
+}
+
+.admin-table th {
+    width: auto;
+    border: 2px solid #C0C0C0;
+    padding: 5px;
+    background: #F0F0F0;
+}
+
+.admin-table td {
+    width: auto;
+    border: 2px solid #C0C0C0;
+    text-align: center;
+    padding: 5px;
+}
+
+#fixedbutton {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+}
+
+#ul_top_hypers {
+    position: fixed;
+    bottom: 10px;
+    left: 40%;
+}
+
+#ul_top_hyper {
+    position: fixed;
+    bottom: 10px;
+    left: 45%;
+}
+
+#ul_top_hypers li {
+    display: inline;
+    max-width: 35%;
+    max-height: 35%;
+    margin-bottom: 15px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#ul_top_hyper li {
+    display: inline;
+    max-width: 35%;
+    max-height: 35%;
+    margin-bottom: 15px;
+    margin-left: 5px;
+    margin-right: 5px;
+}

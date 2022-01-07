@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="statics/js/jquery-3.4.1.min.js"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" href="mystyle2.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+        <title>view the time</title>
+    </head>
+    <body onload="getAllReserveDatetime()">
+            <div class="header">
+                <div class="title">查看餐廳時段</div>
+            </div>
+            <div><br><br>
+            </div>
+            <div class="background_1">
+                <img src="https://livejapan.com/public/operation/spot/theme/fine-dining-restaurants/img/main2.jpg" class="photo2">
+                <div class="background_3">
+                    <label for="可預約時段" style="margin-top:5%; margin-left:20%;position:absolute;">
+                        <b>可預約時段</b>
+                    </label>
+                    <div style="margin-left:20%;margin-top:18%;">
+                        <table id="table"  class="time_table" >
+                            <thead >
+                                <tr>
+                                    
+                                    <th style="background-color:rgb(177, 166, 166);" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;時段</th>
+                                    <th style="background-color:rgb(177, 166, 166)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                    
+                                    <th style="background-color:rgb(177, 166, 166)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;剩餘座位&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                <button style="width:15%;height:8%;box-shadow: 2px 4px #888888;background-color:#DACFC3;border-radius:15px;margin-left:45%;margin-top:2.5%;position:relative;" onclick="window.location.href='index.html'">返回</button>    
+            </div>  
+            <div> 
+                <img src="https://livejapan.com/public/operation/spot/theme/fine-dining-restaurants/img/main2.jpg"class="photo3" ></div>    
+            </div>
+        </body>
+    <script type="text/javascript">
+        function getAllReserveDatetime() {
+            $.ajax({
+            type: "GET",
+            url: "api/reservedatetime.do",
+            crossDomain: true,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+              if (response.status == 200) {
+                addReserveDatetime(response.response.data);
+              }
+            },
+            error: function () {
+                    alert("無法連線到伺服器！");
+                }
+            });
+        }
+
+       function addReserveDatetime(data) {
+            $("#table > tbody").empty();
+            var table_html = '';
+            $.each(data, function(index, value) {
+                table_html += '<tr><td scope="row" colspan="2">' + value['available_datetime'] + '</td>';
+                table_html += '<td>' + value['available_seat_number'] + '</td></tr>';
+            })
+
+            $("#table > tbody").append(table_html);
+        }
+    </script>
+</html>

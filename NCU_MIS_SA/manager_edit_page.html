@@ -1,0 +1,182 @@
+<html>
+
+<head>
+    <title>Member File Page</title>
+    <script src="statics/js/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.0.2/sha.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel=stylesheet type="text/css" href="mystyle.css">
+</head>
+
+
+<header>
+    <label class="label-back">
+        檢視管理者資料
+    </label>
+</header>
+
+<body onload="getTempManager()">
+    <table class="member-file" cellpadding=5 align=center>
+        <tr>
+            <td align=center>
+                <font size="3">管理者編號</font>
+            </td>
+            <td><p size=40 id="manager_id" ></p></td>
+        </tr>
+        <tr>
+            <td align=center>
+                <font size="3">權限</font>
+            </td>
+            <td><input id="root" type="number" min="0" max="1" name="newroot" style="width: 40px;"></input></td>
+        </tr>
+        <tr>
+            <td align=center>
+                <font size="3">新密碼</font>
+            </td>
+            <td><input type="password" size=40 id="new_pwd" value=""></td>
+        </tr>
+        <tr>
+            <td align=center>
+                <font size="3">確認密碼</font>
+            </td>
+            <td><input type="password" size=40 id="again_pwd" value=""></td>
+        </tr>
+        <tr>
+        	<td align=center>
+                <font size="3">顯示密碼</font>
+            </td>
+        	<td><input type="checkbox" onclick="showPwd()"></td>
+        </tr>
+    </table>
+    <ul id="ul_top_hyper">
+        <li>
+            <button onclick="compareTwoPwd()">確認修改</button>
+        </li>
+
+        <li>
+            <button onclick="window.location.href='admin_edit.html'">取消</button>
+        </li>
+    </ul>
+</body>
+<script type="text/javascript">
+	function getTempManager(){
+		var url = new URL(window.location.href);
+		var manager_id=url.toString().slice(url.toString().search("html?")+5,url.toString().search("&"));
+		var manager_root=url.toString().slice(url.toString().search("&")+1);
+		document.getElementById("manager_id").innerHTML=manager_id;
+		document.getElementById("root").setAttribute('value',manager_root);
+	}
+	
+	function compareTwoPwd(){
+		var new_pwd=document.getElementById("new_pwd").value;
+		var again_pwd=document.getElementById("again_pwd").value;
+		var manager_id = document.getElementById("manager_id").innerHTML;
+		var root = document.getElementById("root").value;
+		
+		if(new_pwd==="" || again_pwd===""){
+			alert("不能為空值");
+		}
+		else if(new_pwd===again_pwd){
+    		var data_object = {
+                    "manager_id": manager_id,
+                    "root": root,
+                    "password": HashPwd(new_pwd)                
+                };
+                
+             // 將JSON格式轉換成字串
+             var data_string = JSON.stringify(data_object);;
+             // 發出POST的PUT請求
+             $.ajax({
+                     type: "PUT",
+                     url: "api/manager.do",
+                     data: data_string,
+                     crossDomain: true,
+                     cache: false,
+                     dataType: 'json',
+                     timeout: 5000,
+                     success: function (response) {
+                    	var status=JSON.stringify(response.status);
+     	            	if(status==='"200"'){
+                        	alert("修改成功");
+                        	backToFile();
+                        }
+                     },
+                     error: function () {
+                         alert("無法連線到伺服器！");
+                     }
+                });
+		}
+		else{
+			alert("兩次密碼不一致");
+		}
+	}
+	
+	function backToFile(){
+		jsarray1 = JSON.parse(sessionStorage.getItem("manager"));
+		var manager_id = jsarray1[0];
+		sessionStorage.removeItem("manager");
+		managerDataReload(manager_id);
+	}
+	
+    function showPwd(){
+        var x = document.getElementById("new_pwd");
+        var y = document.getElementById("again_pwd");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+        if (y.type === "password") {
+            y.type = "text";
+        } else {
+            y.type = "password";
+        }
+    }
+    
+    function setManagerData(manager_id,root){
+        jsarray=[manager_id,root];
+        sessionStorage.setItem("manager", JSON.stringify(jsarray));
+    }
+    
+    function managerDataReload(id){
+        	// 將資料組成JSON格式
+            var data_object = {
+                "manager_id": id,
+            };
+            // 發出POST的AJAX請求
+            $.ajax({
+	            type: "GET",
+	            url: "api/manager.do",
+	            data: data_object,
+	            crossDomain: true,
+	            cache: false,
+	            dataType: 'json',
+	            timeout: 5000,
+	            success: function (response) {
+               		var outuserdata=JSON.stringify(response.response.data);
+                   	var fixoutuserdata=outuserdata.replace('[','');
+                   	var fixoutuserdata=fixoutuserdata.replace(']','');
+                   	var root = JSON.parse(fixoutuserdata).root;
+                    delay(2000);
+                   	setManagerData(id,root);
+                   	window.location.href="admin_center.html";
+
+                },
+                error: function () {
+                    alert("無法連線到伺服器！");
+                }
+            });
+    }
+    
+    function delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+    
+    function HashPwd(pwd) {
+  	  var hashObj = new jsSHA("SHA-256", "TEXT", {numRounds: 1});
+  	  hashObj.update(pwd);
+  	  var hash = hashObj.getHash("HEX");
+  	  return hash;
+ 	}
+</script>
+</html>

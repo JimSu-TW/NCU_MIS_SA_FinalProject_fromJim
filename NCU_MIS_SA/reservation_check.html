@@ -1,0 +1,108 @@
+<html>
+    <head>
+        <script src="statics/js/jquery-3.4.1.min.js"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>輸入資料</title>
+        <link rel="stylesheet" href ="mystyle3.css">
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    </head>
+    <body>
+        <div class= "header_check">
+            <ul>
+                <img src="alert.png" width="25" height="25"><span class="title2"><strong> 確認訂單</strong></span>
+            </ul>
+        </div>
+        <div class="check">
+                <div>
+                    <label for="name"><span>姓名：</span></label>
+                    <input type ="text" class="name" required="required">
+                </div>
+                <div>
+                    <label for="mail"><span>信箱：</span></label>
+                    <input type ="email" class="email" required="required">
+                </div>
+                <div>
+                    <label for="tel"><span>電話：</span></label>
+                    <input type ="tel" class="phone" required="required">
+                </div>
+                <div>
+                    <input type="submit" onclick="checkData()" id="btn" value="送出">
+                </div>
+        </div>
+    </body>
+    <script type="text/javascript">
+       function checkData(){
+           jsarray1 = JSON.parse(sessionStorage.getItem("reserve_data"));
+           jsarray2 = JSON.parse(sessionStorage.getItem("user"));
+           var name=jsarray1[2];
+           var phone=jsarray1[3];
+           var email=jsarray2[1];
+           var temp_name=document.querySelector('.name').value;
+           var temp_phone=document.querySelector('.phone').value;
+           var temp_email=document.querySelector('.email').value;
+           if(name===temp_name && phone===temp_phone && email===temp_email){
+               var data_object = {
+                   "user_id": jsarray2[0],
+                   "name": name,
+                   "phone_number":phone,
+                   "reserve_datetime_id":jsarray1[5],
+                   "number_of_people":jsarray1[1],
+                   "note":jsarray1[4]
+               };
+               var data_string = JSON.stringify(data_object);
+               $.ajax({
+                   type: "POST",
+                   url: "api/reserve.do",
+                   data: data_string,
+                   crossDomain: true,
+                   cache: false,
+                   dataType: 'json',
+                   timeout: 5000,
+                   success: function (response) {
+                       remainSeat();
+                   },
+                   error: function () {
+                       alert("無法連線到伺服器！");
+                   }
+               });
+           }
+           else{
+               alert("資料有誤");
+               window.location.href='show_reservation.html';
+           }
+       }
+       function remainSeat(){
+    	   jsarray1 = JSON.parse(sessionStorage.getItem("reserve_data"));
+    	   var remainseat=jsarray1[6]-jsarray1[1];
+    	   var data_object = {
+		            "reserve_datetime_id": jsarray1[5],
+		            "reserve_datetime": jsarray1[0],
+		            "seat": remainseat
+		        };
+		   var data_string=JSON.stringify(data_object);
+	        // 發出POST的AJAX請求
+	       $.ajax({
+	                type: "PUT",
+	                url: "api/reservedatetime.do",
+	                data: data_string,
+	                crossDomain: true,
+	                cache: false,
+	                dataType: 'json',
+	                timeout: 5000,
+	                success: function (response) {
+	                	$('#flashMessage').html(response.message);
+                       $('#flashMessage').show();
+                       if(response.status == 200){
+                           sessionStorage.removeItem("reserve_people_time_data");
+                    	   sessionStorage.removeItem("reserve_data");
+                           alert("已送出訂位！");
+                           window.location.href="view_member_login.html";
+                       }
+	                },
+	                error: function () {
+	                    alert("無法連線到伺服器！");
+	                }
+	        });
+       }
+   </script>
+</html>

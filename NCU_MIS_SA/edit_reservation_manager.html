@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="mystyle2.css">
+        <script src="statics/js/jquery-3.4.1.min.js"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+        <title>預約訂位</title>
+    </head>
+    <body onload="getReservePeopleandTimeData()">
+        <div class="header">
+            <div class="title">預約訂位</div>      
+        </div>
+        <div><br><br></div>
+        <div class="background_1">
+            <img src="https://livejapan.com/public/operation/spot/theme/fine-dining-restaurants/img/main2.jpg" class="photo2">
+            <div> 
+                <img src="https://livejapan.com/public/operation/spot/theme/fine-dining-restaurants/img/main2.jpg"class="photo3" >
+            </div>
+            
+            <div class="background_3">
+                    <label for="預計預約日期時段" style="margin-top:2%; margin-left:20%;position:absolute;text-align:center;">
+                        <b>預計日期時段</b>
+                    </label>
+                    <div>  
+                        <p id="datetime" style="margin-top:8%;margin-left: 20%;position: absolute;"></p>
+                    </div>
+
+                    <label for="用餐人數" style="margin-top:15%; margin-left:20%;position:absolute;"><b>用餐人數</b></label>
+                    <div>
+                        <p id="num_of_people" style="margin-top:20%;margin-left:20%;position:absolute;"></p>
+                    </div>
+                    
+                    <label for="姓名"  style="margin-top:27%; margin-left:20%;position:absolute;">
+                        <b>姓名</b>
+                    </label>
+                    <div>
+                        <p id="user_name" style="margin-top:32%;margin-left:20%;position:absolute;"></p>
+                    </div>
+                    
+                    <label for="電話"  style="margin-top:40%; margin-left:20%;position:absolute;">
+                            <b>電話</b>
+                    </label>
+                    <div style="border-width: 2px; border-style:solid ; width: 382px; height: 25px; border-color: #967F65; padding: 4px; text-align: center;margin-left:20%;margin-top:0;position: absolute;top: 52%;">
+                        <textarea id="phone" style="position: absolute;left:1px;"></textarea>
+                    </div>
+
+                    <label for="備註" style="margin-top:52%; margin-left:20%;position:absolute;">
+                        <b>備註</b>
+                    </label>
+                    <div style="border-width: 2px; border-style:solid ; width: 382px; height: 50px; border-color: #967F65; padding: 5px; text-align: center;margin-left:20%;margin-top:0;position: absolute;top: 66%;">
+                        <textarea id="note" style="position: absolute;left:1px;"></textarea>
+                    </div>
+                    
+                        <button style="width:15%;height: 8%;box-shadow: 2px 4px #888888;background-color:#DACFC3;border-radius:15px;margin-left :35%;margin-top:75%;position:absolute;" onclick="getReserveData()" >完成</button>
+                        <button style="width:15%;height:8%;box-shadow: 2px 4px #888888;background-color:#ffa544;border-radius:15px;margin-left:60%;margin-top:75%;position:absolute;" onclick="backToView()">返回</button>
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript">
+        function getReserveData(){
+        	var phone = document.getElementById("phone").value;
+        	var jsarray = JSON.parse(sessionStorage.getItem("modify_reserve_data"));
+        	if(phone===null){
+        		alert("請填手機號碼");
+        	}
+        	else if(phone.length===10){
+        		var data_object = {
+                        "reserve_id": jsarray[0],
+                        "user_id": jsarray[7],
+                        "name": jsarray[3],
+                        "phone_number": phone,
+                        "reserve_datetime_id": jsarray[6],
+                        "number_of_people":jsarray[6],
+                        "rate":0,
+                        "note":document.getElementById("note").value   
+                };
+     		   var data_string = JSON.stringify(data_object);
+                $.ajax({
+                    type: "PUT",
+                    url: "api/reserve.do",
+                    data: data_string,
+                    crossDomain: true,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                        if(JSON.stringify(response.status) === '"200"'){
+                            alert("修改成功");
+                            backToView();
+                        }
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+                });
+        	}
+        	else{
+        		alert("手機號碼有誤");
+        	}
+        }
+        function getReservePeopleandTimeData(){
+            jsarray1 = JSON.parse(sessionStorage.getItem("modify_reserve_data"));
+            document.getElementById("datetime").innerHTML=jsarray1[1];
+            document.getElementById("num_of_people").innerHTML=jsarray1[2]+"人";
+            document.getElementById("user_name").innerHTML=jsarray1[3];
+            document.getElementById("phone").innerHTML=jsarray1[4];
+            document.getElementById("note").innerHTML=jsarray1[5];
+        }
+        
+        function backToView(){
+        	jsarray1 = JSON.parse(sessionStorage.getItem("modify_reserve_data"));
+        	sessionStorage.removeItem("modify_reserve_data");
+        	window.location.href="manager_show_reservation.html?"+jsarray1[0];
+        }
+    </script>
+</html>
+
